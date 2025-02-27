@@ -1,58 +1,69 @@
-name: Upload git.json to Azure Blob Storage
+name: Upload to Azure Blob Storage
 
 on:
   push:
-    branches:
-      - main # Trigger on push to the main branch
+    branches: [main]
 
 jobs:
-  upload-to-azure:
+  upload:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
-      - name: Install Azure Storage Blob client library
-        run: |
-          python -m pip install --upgrade pip
-          pip install azure-storage-blob
+      - name: Install Azure SDK
+        run: pip install azure-storage-blob
 
-      - name: Upload git.json to Azure Blob Storage
+      - name: Upload to Azure Blob Storage
         env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
         run: |
+          # Verify file location
+          ls -la ./git.json || echo "git.json not found!"
+
           python <<EOF
           from azure.storage.blob import BlobServiceClient
+          from azure.core.exceptions import ResourceExistsError
           import os
 
-          # Retrieve the storage account name and key from environment variables
+          # Get credentials from environment
           account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME')
           account_key = os.getenv('AZURE_STORAGE_ACCOUNT_KEY')
 
-          # Create the connection string
-          connection_string = f'DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net'
+          if not all([account_name, account_key]):
+              raise ValueError("Missing Azure credentials in environment variables")
 
-          # Initialize the BlobServiceClient
-          blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+          # Verify file exists in correct location
+          file_path = './git.json'
+          if not os.path.exists(file_path):
+              raise FileNotFoundError(f"{file_path} not found in repository root")
 
-          # Define the container and blob names
-          container_name = 'parameters'
-          blob_name = 'git.json'
-          local_file_path = './git.json'
+          # Create client
+          conn_string = f"DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net"
+          blob_service_client = BlobServiceClient.from_connection_string(conn_string)
 
-          # Get the container client
+          # Container management
+          container_name = "parameters"
           container_client = blob_service_client.get_container_client(container_name)
 
-          # Upload the file
-          with open(local_file_path, 'rb') as data:
-              container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+          try:
+              container_client.create_container()
+              print(f"Created container {container_name}")
+          except ResourceExistsError:
+              print(f"Container {container_name} already exists")
 
-          print('git.json has been uploaded to Azure Blob Storage successfully.')
+          # Upload file
+          with open(file_path, "rb") as data:
+              container_client.upload_blob(
+                  name="git.json",
+                  data=data,
+                  overwrite=True
+              )
+          print("Upload completed successfully")
           EOF
