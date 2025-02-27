@@ -1,0 +1,52 @@
+[
+    {
+        "rel_url": "/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Calendar.csv",
+        "folder_name" : "Calender",
+        "file_name" : "calender.csv"
+    },
+    {
+        "rel_url": "/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Customers.csv",
+        "folder_name" : "Customer",
+        "file_name" : "customers.csv"
+    },
+    {
+        "rel_url": "/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Product_Categories.csv",
+        "folder_name" : "Product_Categories",
+        "file_name" : "product_categories.csv"
+    },
+    {
+        "rel_url": "/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Product_Subcategories.csv",
+        "folder_name": "Product_Subcategories",
+        "file_name":"product_subcategories.csv"
+    },
+    {
+        "rel_url": "/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Products.csv",
+        "folder_name":"Product",
+        "file_name":"products.csv"
+    },
+    {
+        "rel_url":"/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Returns.csv",
+        "folder_name":"Returns",
+        "file_name":"return.csv"
+    },
+    {
+        "rel_url":"/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Sales_2015.csv",
+        "folder_name":"Sales_2015",
+        "file_name":"sales_2015.csv"
+    },
+    {
+        "rel_url":"/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Sales_2016.csv",
+        "folder_name":"Sales_2016",
+        "file_name":"sales_2016.csv"
+    },
+    {
+        "rel_url":"/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Sales_2017.csv",
+        "folder_name":"Sales_2017",
+        "file_name":"sales_2017.csv"
+    },
+    {
+        "rel_url":"/6namdang/Data-enginner-set/refs/heads/main/Data/AdventureWorks_Territories.csv",
+        "folder_name":"Territories",
+        "file_name":"territories.csv"
+    }
+]

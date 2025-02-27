@@ -1,0 +1,58 @@
+name: Upload git.json to Azure Blob Storage
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to the main branch
+
+jobs:
+  upload-to-azure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install Azure Storage Blob client library
+        run: |
+          python -m pip install --upgrade pip
+          pip install azure-storage-blob
+
+      - name: Upload git.json to Azure Blob Storage
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+        run: |
+          python <<EOF
+          from azure.storage.blob import BlobServiceClient
+          import os
+
+          # Retrieve the storage account name and key from environment variables
+          account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME')
+          account_key = os.getenv('AZURE_STORAGE_ACCOUNT_KEY')
+
+          # Create the connection string
+          connection_string = f'DefaultEndpointsProtocol=https;AccountName={account_name};AccountKey={account_key};EndpointSuffix=core.windows.net'
+
+          # Initialize the BlobServiceClient
+          blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+
+          # Define the container and blob names
+          container_name = 'parameters'
+          blob_name = 'git.json'
+          local_file_path = 'path/to/your/git.json'  # Update this path if git.json is located elsewhere
+
+          # Get the container client
+          container_client = blob_service_client.get_container_client(container_name)
+
+          # Upload the file
+          with open(local_file_path, 'rb') as data:
+              container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+
+          print('git.json has been uploaded to Azure Blob Storage successfully.')
+          EOF
