@@ -45,7 +45,7 @@ jobs:
           # Define the container and blob names
           container_name = 'parameters'
           blob_name = 'git.json'
-          local_file_path = '../git.json'
+          local_file_path = './git.json'
 
           # Get the container client
           container_client = blob_service_client.get_container_client(container_name)
